@@ -1,16 +1,18 @@
 package com.minecraft.minecraft;
+        import com.google.gson.Gson;
+        import com.minecraft.minecraft.Model.Post;
+        import io.qameta.allure.Links;
+        import org.jsoup.Jsoup;
+        import org.jsoup.nodes.Document;
+        import org.jsoup.nodes.Element;
+        import org.jsoup.nodes.TextNode;
+        import org.jsoup.select.Elements;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.TextNode;
-import org.jsoup.select.Elements;
+        import java.io.IOException;
+        import java.util.ArrayList;
+        import java.util.List;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-public class Mine {
+public class Mine2 {
     public static void main(String[] args) throws IOException {
         String baseUrl ="https://www.9minecraft.net/crossroads-mc-mod/";
         Document doc = Jsoup.connect(baseUrl).get();
@@ -37,41 +39,55 @@ public class Mine {
         System.out.println("After remove \n"+content);
         Elements imgElements = content.getElementsByTag("img");
         int i =0;
-        List<String> imageDatas = new ArrayList<>();
-        for (Element imgElement: imgElements) {
+       List<String> imageData = new ArrayList<>();
+
+        imgElements.forEach(imgElement->{
             if(imgElement.attr("src").contains("http")){
-                i++;
-                System.out.println("img: "+i+ ":"+imgElement.attr("src"));
-                imageDatas.add(imgElement.attr("src"));
+                String img = imgElement.attr("src");
+                System.out.println(img);
+                imageData.add(img);
+
+                System.out.println("hello-----");
+
+                System.out.println(content.getElementsMatchingText(imgElement.toString()));
+
+
             }
+        });
 
 
-        }
-
+        List<String> linkData = new ArrayList<>();
         Elements blockquoteElements = (Elements) content.getElementsByTag("blockquote");
-        for (Element blockquoteElement :blockquoteElements){
+        blockquoteElements.forEach(blockquoteElement->{
             Elements links = blockquoteElement.getElementsByTag("a");
-
-            for (Element link: links) {
+            links.forEach(link->{
                 if(link.attr("href").contains("act=dl&id=")){
-                    System.out.println(link.text());
-                    String linkDownload = link.attr("href");
-                    System.out.println(linkDownload);
+                    String ldt = link.attr("href");
+                    System.out.println(link.attr("href"));
+                    linkData.add(ldt);
 
-                    Document downloadPage = Jsoup.connect(linkDownload).get();
-                    String linkDownloadPage = downloadPage.getElementsByTag("a").attr("href");
-                    System.out.println(linkDownloadPage);
-                }else {
-                    String linkDownload = link.attr("href").replace("9minecraft.net","9minecraft.org");
-                    System.out.println(linkDownload);
                 }
 
-                break;
-            }
+            });
 
-        }
+        });
+
+        // Info
+        Post post = new Post();
+        post.setTitle(title2);
+        post.setContent(content.toString());
+        post.setLinkDatas(linkData);
+        post.setImageDatas(imageData);
+
+        System.out.println("POST CONTENTS HERE: ");
+
+        Gson gson = new Gson();
+
+        String output = gson.toJson(post);
+        System.out.println(output);
 
     }
 
 
 }
+
